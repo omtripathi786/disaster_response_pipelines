@@ -36,5 +36,10 @@ The app uses a ML model to categorize any new messages received, and the reposit
 Note :- before running the web app make sure you have run both pipeline script.
 inorder to genrate the db and model file. and then give the same db file name in run.py file.
 
+## ***Project screenshots and Data visualization***
+![Alt text](screenshots//ss1.jpg?raw=true )
+![Alt text](screenshots//ss2.jpg?raw=true )
+![Alt text](screenshots//ss3.jpg?raw=true )
+
 ## ***Licensing, Authors, Acknowledgements***
 This app was completed as part of the [Udacity Data Scientist Nanodegree](https://www.udacity.com/course/data-scientist-nanodegree--nd025). Code templates and data were provided by Udacity. The data was originally sourced by Udacity from Figure Eight
