@@ -27,13 +27,14 @@ def load_data(database_filepath):
                 y: categories (numeric)
                 categories: An ordered list of categories name
     '''
-
+    # loading the data from the db
     engine = create_engine('sqlite:///{}'.format(database_filepath))
     df = pd.read_sql("SELECT * FROM messages_table", engine)
-
+    # creating a dataframe with only message feature.
     X = df['message']
-
+    # creating dataframe with relevant categories.
     y = df.drop(['id', 'message', 'original', 'genre'], axis=1).astype(float)
+    # storing the categories name list
     categories = y.columns.values
     return X, y, categories
 
@@ -55,18 +56,19 @@ def build_model():
     Args: None
     Returns: Model
     '''
+    # creating pipeline with RandomForestClassifier to fit the model
     pipeline = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize)),
         ('tfidf', TfidfTransformer()),
         ('clf', RandomForestClassifier())])
-
+    # parameters grid search.
     parameters = {
         'clf__min_samples_split': [5, 10, 15],
         'clf__n_estimators': [50, 100, 150]}
 
     cv = GridSearchCV(pipeline, param_grid=parameters,
                       scoring='accuracy', verbose=1, n_jobs=-1)
-
+    # for now retuning only pipeline for faster processing.
     return pipeline
 
 

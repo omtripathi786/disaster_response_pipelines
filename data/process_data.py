@@ -9,9 +9,12 @@ def encode_categories(categories):
     Args: categories data frame.
     Returns: encoded categories.
     '''
+
+    # spiting the categories to get the separate categories name and values.
     categories = categories['categories'].str.split(';', expand=True)
     row = categories.iloc[[1]].values[0]
     categories.columns = [x.split("-")[0] for x in row]
+    # giving the numerical value (0,1) to the categories
     for col in categories:
         categories[col] = categories[col].map(
             lambda x: 1 if int(x.split("-")[1]) > 0 else 0)
@@ -25,9 +28,12 @@ def load_data(messages_filepath, categories_filepath):
             categories_filepath: The file path to the categories.csv file.
     Returns: A pandas DataFrame containing both files.
     '''
-    messages = pd.read_csv(messages_filepath)
-    categories = encode_categories(pd.read_csv(categories_filepath))
 
+    # loading the messages csv file
+    messages = pd.read_csv(messages_filepath)
+    # getting the encoded categories from the function
+    categories = encode_categories(pd.read_csv(categories_filepath))
+    # combining the message and categories data to single datafarme
     return pd.concat([messages, categories], join="inner", axis=1)
 
 
@@ -37,6 +43,7 @@ def clean_data(df):
     Args: pandas DataFrame gross.
     Returns: pandas DataFrame after removing duplicate
     '''
+    # removing the duplicate
     return df.drop_duplicates()
 
 
@@ -47,6 +54,8 @@ def save_data(df, database_filename):
             database_filename: The path where the sql database shall be saved
     Returns: Nothing. The function saves the database in an sql file
     '''
+
+    # saving the data to given filename.
     engine = create_engine('sqlite:///' + database_filename)
     df.to_sql('messages_table', engine, if_exists='replace', index=False)
 
