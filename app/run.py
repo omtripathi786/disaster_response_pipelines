@@ -8,11 +8,12 @@ from nltk.tokenize import word_tokenize
 from flask import Flask
 from flask import render_template, request, jsonify
 from plotly.graph_objs import Bar
+from plotly.graph_objs import Heatmap
 from sklearn.externals import joblib
 from sqlalchemy import create_engine
 
-
 app = Flask(__name__)
+
 
 def tokenize(text):
     tokens = word_tokenize(text)
@@ -25,24 +26,31 @@ def tokenize(text):
 
     return clean_tokens
 
+
 # load data
-engine = create_engine('sqlite:///../data/DisasterResponse.db')
+# engine = create_engine('sqlite:///../data/DisasterResponse.db')
+engine = create_engine('sqlite:///../../mlp/DisasterResponse.db')
 df = pd.read_sql_table('messages_table', engine)
 
 # load model
-model = joblib.load("../models/disaster_model.sav")
+# model = joblib.load("../models/disaster_model.sav")
+model = joblib.load("../../mlp/disaster_model.sav")
 
 
 # index webpage displays cool visuals and receives user input text for model
 @app.route('/')
 @app.route('/index')
 def index():
-    
     # extract data needed for visuals
     # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
-    
+    y = df.drop(['id', 'message', 'original', 'genre'], axis=1).astype(float)
+    cat_names = y.columns.values
+    cat_counts = [sum(y[x]) for x in cat_names]
+    corr = y.corr()
+    labels = y.columns.values
+
     # create visuals
     # TODO: Below is an example - modify to create your own visuals
     graphs = [
@@ -63,13 +71,45 @@ def index():
                     'title': "Genre"
                 }
             }
+        },
+        {
+            'data': [
+                Bar(
+                    x=cat_names,
+                    y=cat_counts
+                )
+            ],
+
+            'layout': {
+                'title': 'Distribution of Message categories',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Genre"
+                }
+            }
+        },
+        {
+            'data': [
+                Heatmap(
+                    z=corr.values,
+                    x=labels,
+                    y=labels
+                )
+            ],
+
+            'layout': {
+                'title': 'Categories Correlation',
+                'height': 1000
+            }
         }
     ]
-    
+
     # encode plotly graphs in JSON
     ids = ["graph-{}".format(i) for i, _ in enumerate(graphs)]
     graphJSON = json.dumps(graphs, cls=plotly.utils.PlotlyJSONEncoder)
-    
+
     # render web page with plotly graphs
     return render_template('master.html', ids=ids, graphJSON=graphJSON)
 
@@ -78,7 +118,7 @@ def index():
 @app.route('/go')
 def go():
     # save user input in query
-    query = request.args.get('query', '') 
+    query = request.args.get('query', '')
 
     # use model to predict classification for query
     classification_labels = model.predict([query])[0]
