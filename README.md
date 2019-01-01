@@ -31,7 +31,10 @@ The app uses a ML model to categorize any new messages received, and the reposit
 1. Save the app folder in the current working directory.
 2. Run the following command in the app directory:
     `python run.py`
-3. Go to http://0.0.0.0:3001/
+3. Go to http://127.0.0.1:9000/
+
+Note :- before running the web app make sure you have run both pipeline script.
+inorder to genrate the db and model file. and then give the same db file name in run.py file.
 
 ## ***Licensing, Authors, Acknowledgements***
 This app was completed as part of the [Udacity Data Scientist Nanodegree](https://www.udacity.com/course/data-scientist-nanodegree--nd025). Code templates and data were provided by Udacity. The data was originally sourced by Udacity from Figure Eight
